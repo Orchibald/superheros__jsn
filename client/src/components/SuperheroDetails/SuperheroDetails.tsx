@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { RootState } from '../../store/store';
 import './SuperheroDetails.scss';
+import { ImgHero } from '../ImgHero/ImgHero';
 
 const SuperheroDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -31,19 +32,7 @@ const SuperheroDetails: React.FC = () => {
       <p className="details__info">
         <strong>Catchphrases:</strong> {superhero.catchPhrases.join(', ')}
       </p>
-      <div className="details__images">
-        <strong>Images:</strong>
-        <div className="details__image-list">
-          {superhero.images.map((image, index) => (
-            <img
-              key={index}
-              src={image}
-              alt={superhero.nickname}
-              className="details__image"
-            />
-          ))}
-        </div>
-      </div>
+      <ImgHero hero={superhero} />
     </div>
   );
 };

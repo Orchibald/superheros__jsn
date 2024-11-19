@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../store/store';
-import { updateSuperhero } from '../../store/slices/superherosSlice';
+import { updateSuperhero, updateSuperheroAsynk } from '../../store/slices/superherosSlice';
 import './EditSuperhero.scss';
+import { ImgHero } from '../ImgHero/ImgHero';
 
 const EditSuperhero: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,7 +21,7 @@ const EditSuperhero: React.FC = () => {
     originDescription: '',
     superpowers: '',
     catchPhrases: '',
-    images: '',
+    images: [] as File[],
   });
 
   useEffect(() => {
@@ -31,28 +32,55 @@ const EditSuperhero: React.FC = () => {
         originDescription: superhero.originDescription,
         superpowers: superhero.superpowers.join(','),
         catchPhrases: superhero.catchPhrases.join(','),
-        images: superhero.images.join(','),
+        images: [],
       });
     }
   }, [superhero]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (superhero) {
-      const updatedHero = {
-        ...superhero,
-        nickname: form.nickname,
-        realName: form.realName,
-        originDescription: form.originDescription,
-        superpowers: form.superpowers.split(','),
-        catchPhrases: form.catchPhrases.split(','),
-        images: form.images.split(',' + ' '),
-      };
-      dispatch(updateSuperhero(updatedHero));
-      navigate('/');
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setForm({ ...form, images: Array.from(e.target.files) });
     }
   };
+
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   if (superhero) {
+  //     const updatedHero = {
+  //       ...superhero,
+  //       nickname: form.nickname,
+  //       realName: form.realName,
+  //       originDescription: form.originDescription,
+  //       superpowers: form.superpowers.split(','),
+  //       catchPhrases: form.catchPhrases.split(','),
+  //       images: form.images,
+  //     };
+  //     dispatch(updateSuperhero(updatedHero));
+  //     navigate('/');
+  //   }
+  // };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const superheroData = {
+      nickname: form.nickname,
+      realName: form.realName,
+      originDescription: form.originDescription,
+      superpowers: form.superpowers,
+      catchPhrases: form.catchPhrases,
+      images: form.images,
+    };
+
+    try {
+      await dispatch(updateSuperheroAsynk({ id: id!, superheroData }));
+      navigate('/');
+    } catch (error) {
+      console.error('Failed to update superhero', error);
+    }
+  };
+
 
   if (!superhero) {
     return <div className="edit-hero__error">Superhero not found!</div>;
@@ -100,13 +128,26 @@ const EditSuperhero: React.FC = () => {
           required
           className="edit-hero__input"
         />
+        <div className="edit-hero__new-images-preview">
+          <h3>New Images:</h3>
+          {form.images.map((file, index) => (
+            <img
+              key={index}
+              src={URL.createObjectURL(file)}
+              alt={`New Superhero ${index}`}
+              className="details__image"
+            />
+          ))}
+        </div>
         <input
-          placeholder="Images (comma separated URLs)"
-          value={form.images}
-          onChange={e => setForm({ ...form, images: e.target.value })}
-          required
-          className="edit-hero__input"
+          type="file"
+          multiple
+          onChange={handleFileChange}
+          className="add-hero__input"
         />
+        <div className="edit-hero__images-preview">
+          <ImgHero hero={superhero} />
+        </div>
         <button type="submit" className="edit-hero__button">Save Changes</button>
       </form>
     </div>

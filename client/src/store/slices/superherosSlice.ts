@@ -11,6 +11,15 @@ export interface Superhero {
   images: string[];
 }
 
+interface SuperheroUpdateData {
+  nickname: string;
+  realName: string;
+  originDescription: string;
+  superpowers: string;
+  catchPhrases: string;
+  images: File[];
+}
+
 interface SuperheroesState {
   heroes: Superhero[];
   loading: boolean;
@@ -28,7 +37,7 @@ export const deleteSuperheroAsync = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       await axios.delete(`http://localhost:3000/superheros/${id}`);
-      return id; 
+      return id;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Failed to delete superhero');
     }
@@ -38,24 +47,24 @@ export const deleteSuperheroAsync = createAsyncThunk(
 
 export const addSuperheroAsync = createAsyncThunk(
   'superheroes/addSuperhero',
-  async (superheroData: { 
-    nickname: string; 
-    realName: string; 
-    originDescription: string; 
-    superpowers: string; 
-    catchphrases: string; 
-    images: File[]; 
+  async (superheroData: {
+    nickname: string;
+    realName: string;
+    originDescription: string;
+    superpowers: string;
+    catchphrases: string;
+    images: File[];
   }) => {
     const formData = new FormData();
     formData.append('nickname', superheroData.nickname);
     formData.append('realName', superheroData.realName);
     formData.append('originDescription', superheroData.originDescription);
-    
+
     const superpowersArray = superheroData.superpowers.split(',').map(item => item.trim());
     const catchphrasesArray = superheroData.catchphrases.split(',').map(item => item.trim());
-    
-    formData.append('superpowers', JSON.stringify(superpowersArray)); 
-    formData.append('catchphrases', JSON.stringify(catchphrasesArray)); 
+
+    formData.append('superpowers', JSON.stringify(superpowersArray));
+    formData.append('catchphrases', JSON.stringify(catchphrasesArray));
 
     superheroData.images.forEach((file) => {
       formData.append('images', file);
@@ -71,13 +80,38 @@ export const addSuperheroAsync = createAsyncThunk(
   }
 );
 
+export const updateSuperheroAsynk = createAsyncThunk(
+  'superheroes/updateSuperhero',
+  async ({ id, superheroData }: { id: string, superheroData: SuperheroUpdateData }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append('nickname', superheroData.nickname);
+      formData.append('realName', superheroData.realName);
+      formData.append('originDescription', superheroData.originDescription);
+      formData.append('superpowers', superheroData.superpowers);
+      formData.append('catchPhrases', superheroData.catchPhrases);
+
+      superheroData.images.forEach(file => {
+        formData.append('images', file);
+      });
+
+      const response = await axios.patch(`http://localhost:3000/superheros/${id}`, formData);
+      if (!response.data) {
+        throw new Error('Failed to update superhero');
+      }
+      return response.data; 
+    } catch (error) {
+    }
+  }
+);
+
 
 
 export const fetchSuperheroes = createAsyncThunk(
-  'superheroes/fetchSuperheroes', 
+  'superheroes/fetchSuperheroes',
   async () => {
     const response = await axios.get('http://localhost:3000/superheros');
-    return response.data; 
+    return response.data;
   }
 );
 
@@ -126,6 +160,18 @@ const superheroesSlice = createSlice({
         state.heroes = state.heroes.filter(hero => hero.id !== action.payload);
       })
       .addCase(deleteSuperheroAsync.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      .addCase(updateSuperheroAsynk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateSuperheroAsynk.fulfilled, (state, action) => {
+        const updatedHeroIndex = state.heroes.findIndex(hero => hero.id === action.payload.id);
+        if (updatedHeroIndex !== -1) {
+          state.heroes[updatedHeroIndex] = action.payload;
+        }
+      })
+      .addCase(updateSuperheroAsynk.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   }

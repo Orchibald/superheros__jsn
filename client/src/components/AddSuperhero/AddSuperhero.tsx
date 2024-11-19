@@ -12,7 +12,7 @@ const AddSuperhero: React.FC = () => {
     originDescription: '',
     superpowers: '',
     catchphrases: '',
-    images: [] as File[], 
+    images: [] as File[],
   });
 
   const dispatch = useDispatch<AppDispatch>();
@@ -33,12 +33,12 @@ const AddSuperhero: React.FC = () => {
       originDescription: form.originDescription,
       superpowers: form.superpowers,
       catchphrases: form.catchphrases,
-      images: form.images, 
+      images: form.images,
     };
 
     try {
       await dispatch(addSuperheroAsync(superheroData));
-      navigate('/'); 
+      navigate('/');
     } catch (error) {
       console.error('Error adding superhero:', error);
     }
@@ -92,6 +92,17 @@ const AddSuperhero: React.FC = () => {
           onChange={handleFileChange}
           className="add-hero__input"
         />
+        <div className="edit-hero__new-images-preview">
+          <h3>New Images:</h3>
+          {form.images.map((file, index) => (
+            <img
+              key={index}
+              src={URL.createObjectURL(file)}
+              alt={`New Superhero ${index}`}
+              className="details__image"
+            />
+          ))}
+        </div>
         <button type="submit" className="add-hero__button">
           Add Superhero
         </button>
