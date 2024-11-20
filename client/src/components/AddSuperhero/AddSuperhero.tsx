@@ -24,6 +24,13 @@ const AddSuperhero: React.FC = () => {
     }
   };
 
+  const handleRemoveImage = (index: number) => {
+    setForm(prevForm => ({
+      ...prevForm,
+      images: prevForm.images.filter((_, i) => i !== index),
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -95,12 +102,20 @@ const AddSuperhero: React.FC = () => {
         <div className="edit-hero__new-images-preview">
           <h3>New Images:</h3>
           {form.images.map((file, index) => (
-            <img
-              key={index}
-              src={URL.createObjectURL(file)}
-              alt={`New Superhero ${index}`}
-              className="details__image"
-            />
+            <div key={index} className="edit-hero__new-image-container">
+              <img
+                src={URL.createObjectURL(file)}
+                alt={`New Superhero ${index}`}
+                className="details__image"
+              />
+              <button
+                type="button"
+                className="edit-hero__image-delete"
+                onClick={() => handleRemoveImage(index)}
+              >
+                ×
+              </button>
+            </div>
           ))}
         </div>
         <button type="submit" className="add-hero__button">

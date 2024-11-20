@@ -1,0 +1,53 @@
+.details {
+  &__images {
+    margin-top: 20px;
+  }
+
+  &-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+
+  &__image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    &-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    &-delete {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: rgba(255, 0, 0, 0.8);
+      border: none;
+      color: white;
+      font-size: 16px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    &-delete:hover {
+      background: rgba(255, 0, 0, 1);
+    }
+  }
+}
+

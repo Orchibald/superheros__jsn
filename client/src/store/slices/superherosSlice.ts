@@ -44,7 +44,6 @@ export const deleteSuperheroAsync = createAsyncThunk(
   }
 );
 
-
 export const addSuperheroAsync = createAsyncThunk(
   'superheroes/addSuperhero',
   async (superheroData: {
@@ -82,7 +81,7 @@ export const addSuperheroAsync = createAsyncThunk(
 
 export const updateSuperheroAsynk = createAsyncThunk(
   'superheroes/updateSuperhero',
-  async ({ id, superheroData }: { id: string, superheroData: SuperheroUpdateData }, { rejectWithValue }) => {
+  async ({ id, superheroData }: { id: string, superheroData: SuperheroUpdateData }) => {
     try {
       const formData = new FormData();
       formData.append('nickname', superheroData.nickname);
@@ -105,13 +104,25 @@ export const updateSuperheroAsynk = createAsyncThunk(
   }
 );
 
-
-
 export const fetchSuperheroes = createAsyncThunk(
   'superheroes/fetchSuperheroes',
   async () => {
     const response = await axios.get('http://localhost:3000/superheros');
     return response.data;
+  }
+);
+
+export const deleteImageAsync = createAsyncThunk(
+  'superheroes/deleteImage',
+  async ({ id, image }: { id: string; image: string }, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/superheros/${id}/images`, {
+        data: { image },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Failed to delete image');
+    }
   }
 );
 
@@ -172,6 +183,16 @@ const superheroesSlice = createSlice({
         }
       })
       .addCase(updateSuperheroAsynk.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      .addCase(deleteImageAsync.fulfilled, (state, action) => {
+        const updatedHero = action.payload;
+        const index = state.heroes.findIndex(hero => hero.id === updatedHero.id);
+        if (index !== -1) {
+          state.heroes[index] = updatedHero;
+        }
+      })
+      .addCase(deleteImageAsync.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   }

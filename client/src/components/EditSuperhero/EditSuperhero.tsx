@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../store/store';
-import { updateSuperhero, updateSuperheroAsynk } from '../../store/slices/superherosSlice';
+import { updateSuperheroAsynk } from '../../store/slices/superherosSlice';
 import './EditSuperhero.scss';
 import { ImgHero } from '../ImgHero/ImgHero';
 
@@ -43,23 +43,12 @@ const EditSuperhero: React.FC = () => {
     }
   };
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //   if (superhero) {
-  //     const updatedHero = {
-  //       ...superhero,
-  //       nickname: form.nickname,
-  //       realName: form.realName,
-  //       originDescription: form.originDescription,
-  //       superpowers: form.superpowers.split(','),
-  //       catchPhrases: form.catchPhrases.split(','),
-  //       images: form.images,
-  //     };
-  //     dispatch(updateSuperhero(updatedHero));
-  //     navigate('/');
-  //   }
-  // };
+  const handleRemoveImage = (index: number) => {
+    setForm(prevForm => ({
+      ...prevForm,
+      images: prevForm.images.filter((_, i) => i !== index),
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,12 +120,20 @@ const EditSuperhero: React.FC = () => {
         <div className="edit-hero__new-images-preview">
           <h3>New Images:</h3>
           {form.images.map((file, index) => (
-            <img
-              key={index}
-              src={URL.createObjectURL(file)}
-              alt={`New Superhero ${index}`}
-              className="details__image"
-            />
+            <div key={index} className="edit-hero__new-image-container">
+              <img
+                src={URL.createObjectURL(file)}
+                alt={`New Superhero ${index}`}
+                className="details__image"
+              />
+              <button
+                type="button"
+                className="edit-hero__image-delete"
+                onClick={() => handleRemoveImage(index)}
+              >
+                ×
+              </button>
+            </div>
           ))}
         </div>
         <input

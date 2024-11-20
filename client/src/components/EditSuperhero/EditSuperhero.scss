@@ -58,4 +58,31 @@
     font-size: 18px;
     color: red;
   }
+
+  &__new-image-container {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+  }
+  
+  &__image-delete {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
 }
+
+
+

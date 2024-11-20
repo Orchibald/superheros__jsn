@@ -4,9 +4,6 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    console.log(req.body);
-    console.log(req.files);
-
     const imageUrls = req.files ? req.files.map(file => `http://localhost:3000/uploads/${file.filename}`) : [];
 
     const newSuperhero = {
@@ -15,8 +12,7 @@ router.post('/', async (req, res) => {
       catchPhrases: JSON.parse(req.body.catchphrases),
       images: imageUrls,
     };
-    
-
+  
     const superhero = await Superhero.create(newSuperhero);
     console.log(superhero);
     res.status(201).json(superhero); 
@@ -81,5 +77,28 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.delete('/:id/images', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { image } = req.body;
+
+    const superhero = await Superhero.findOne({ where: { id } });
+
+    if (!superhero) {
+      return res.status(404).json({ message: 'Superhero not found' });
+    }
+
+    const updatedImages = superhero.images.filter(img => img !== image);
+
+    await Superhero.update({ images: updatedImages }, { where: { id } });
+
+    const updatedSuperhero = await Superhero.findOne({ where: { id } });
+    res.json(updatedSuperhero);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 module.exports = router;
