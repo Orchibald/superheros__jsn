@@ -23,8 +23,8 @@ Before starting, make sure you have the following installed on your system:
 
 ### 1. Clone the Repository
 ```bash
-git clone <repository_url>
-cd <repository_directory>
+git clone https://github.com/Orchibald/superheros__jsn.git
+cd superheros__jsn
 ```
 
 ### 2. Install Dependencies
